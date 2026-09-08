@@ -78,6 +78,7 @@ big_clock_app/
 ├── services/
 │   ├── notifications.ts     # Local notification scheduler service
 │   └── storage.ts           # Persistent storage service (AsyncStorage)
+├── tests/                   # Security, validation, and storage unit tests
 ├── types/
 │   └── reminder.ts          # TypeScript interfaces for reminders & settings
 ├── utils/
@@ -262,6 +263,22 @@ npx expo prebuild
   ```
 - **Archive `.ipa` in Xcode**:
   Open `ios/bigclockreminders.xcworkspace` in Xcode, select **Product > Destination > Any iOS Device**, and select **Product > Archive** to export for Ad-Hoc or App Store distribution.
+
+---
+
+## 🧪 Testing & Code Coverage
+
+Unit tests are executed using Node.js's native test runner with `tsx` for TypeScript support:
+
+- **Run unit tests**:
+  ```bash
+  npm test
+  ```
+- **Run unit tests with coverage report**:
+  ```bash
+  npm run test:coverage
+  ```
+  *(Or directly via `node --import tsx --test --experimental-test-coverage tests/**/*.test.ts`)*
 
 ---
 
