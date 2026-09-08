@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppTheme, Reminder, ReminderCategory } from '../types/reminder';
 import { CATEGORY_COLORS } from '../constants/themes';
 import { getISODateString } from '../utils/dateFormatter';
+import { isValidISODate, isValidTime24 } from '../utils/validators';
 
 interface AddReminderModalProps {
   visible: boolean;
@@ -63,15 +64,19 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
 
   const categories: ReminderCategory[] = ['work', 'personal', 'health', 'event', 'other'];
 
+  const isDateValid = isValidISODate(date.trim());
+  const isTimeValid = isValidTime24(time.trim());
+  const isFormValid = title.trim().length > 0 && isDateValid && isTimeValid;
+
   const handleSave = () => {
-    if (!title.trim()) return;
+    if (!isFormValid) return;
 
     onSave(
       {
         title: title.trim(),
         notes: notes.trim() || undefined,
-        date,
-        time,
+        date: date.trim(),
+        time: time.trim(),
         category,
         isCompleted: editingReminder ? editingReminder.isCompleted : false,
         hasNotification,
@@ -149,13 +154,20 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                 <TextInput
                   style={[
                     styles.textInput,
-                    { backgroundColor: theme.bg, borderColor: theme.border, color: theme.textPrimary },
+                    {
+                      backgroundColor: theme.bg,
+                      borderColor: !isDateValid && date.trim().length > 0 ? '#EF4444' : theme.border,
+                      color: theme.textPrimary,
+                    },
                   ]}
                   placeholder="2026-09-08"
                   placeholderTextColor={theme.textSecondary + '70'}
                   value={date}
                   onChangeText={setDate}
                 />
+                {!isDateValid && date.trim().length > 0 && (
+                  <Text style={styles.errorHint}>Use YYYY-MM-DD</Text>
+                )}
               </View>
 
               <View style={[styles.inputGroup, { flex: 1 }]}>
@@ -163,13 +175,20 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                 <TextInput
                   style={[
                     styles.textInput,
-                    { backgroundColor: theme.bg, borderColor: theme.border, color: theme.textPrimary },
+                    {
+                      backgroundColor: theme.bg,
+                      borderColor: !isTimeValid && time.trim().length > 0 ? '#EF4444' : theme.border,
+                      color: theme.textPrimary,
+                    },
                   ]}
                   placeholder="14:30"
                   placeholderTextColor={theme.textSecondary + '70'}
                   value={time}
                   onChangeText={setTime}
                 />
+                {!isTimeValid && time.trim().length > 0 && (
+                  <Text style={styles.errorHint}>Use 24h (e.g. 14:30)</Text>
+                )}
               </View>
             </View>
 
@@ -225,10 +244,10 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
             <TouchableOpacity
               style={[
                 styles.saveBtn,
-                { backgroundColor: theme.accent, opacity: title.trim() ? 1 : 0.5 },
+                { backgroundColor: theme.accent, opacity: isFormValid ? 1 : 0.5 },
               ]}
               onPress={handleSave}
-              disabled={!title.trim()}
+              disabled={!isFormValid}
             >
               <Text style={styles.saveBtnText}>
                 {editingReminder ? 'Save Changes' : 'Create Reminder'}
@@ -358,5 +377,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
+  },
+  errorHint: {
+    color: '#EF4444',
+    fontSize: 11,
+    marginTop: 4,
+    fontWeight: '500',
   },
 });
