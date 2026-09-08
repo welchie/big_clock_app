@@ -7,6 +7,7 @@ import {
 import { scheduleNotificationAsync } from 'expo-notifications/build/scheduleNotificationAsync';
 import { cancelScheduledNotificationAsync } from 'expo-notifications/build/cancelScheduledNotificationAsync';
 import { SchedulableTriggerInputTypes } from 'expo-notifications/build/Notifications.types';
+import { parseTriggerDate } from '../utils/validators';
 import { Reminder } from '../types/reminder';
 
 // Configure default notification handler behavior
@@ -52,14 +53,9 @@ export async function scheduleReminderNotification(reminder: Reminder): Promise<
     const hasPermission = await requestNotificationPermissions();
     if (!hasPermission) return undefined;
 
-    // Parse date and time into target Date object
-    const [year, month, day] = reminder.date.split('-').map(Number);
-    const [hours, minutes] = reminder.time.split(':').map(Number);
-
-    const triggerDate = new Date(year, month - 1, day, hours, minutes, 0);
-
-    // Only schedule if trigger date is in the future
-    if (triggerDate.getTime() <= Date.now()) {
+    // Parse date and time into target Date object safely
+    const triggerDate = parseTriggerDate(reminder.date, reminder.time);
+    if (!triggerDate || triggerDate.getTime() <= Date.now()) {
       return undefined;
     }
 
