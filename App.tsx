@@ -287,8 +287,8 @@ const styles = StyleSheet.create({
   landscapeLayout: {
     flex: 1,
     flexDirection: 'row',
-    padding: 12,
-    gap: 12,
+    padding: 10,
+    gap: 10,
   },
   leftColumn: {
     flex: 3,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   rightColumn: {
     flex: 2,
-    gap: 12,
+    gap: 8,
   },
   sidebarToggleBtn: {
     position: 'absolute',
