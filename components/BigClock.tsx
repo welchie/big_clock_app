@@ -120,29 +120,31 @@ export const BigClock: React.FC<BigClockProps> = ({
             {hours}:{minutes}
           </Text>
 
-          {/* Seconds & AM/PM Column */}
-          <View style={styles.metaColumn}>
-            {settings.timeFormat12h && (
-              <Text
-                style={[
-                  styles.periodText,
-                  { color: theme.accent, fontSize: fontScale.periodSize },
-                ]}
-              >
-                {period}
-              </Text>
-            )}
-            {settings.showSeconds && (
-              <Text
-                style={[
-                  styles.secondsText,
-                  { color: theme.textSecondary, fontSize: fontScale.secondsSize },
-                ]}
-              >
-                :{seconds}
-              </Text>
-            )}
-          </View>
+          {/* Seconds */}
+          {settings.showSeconds && (
+            <Text
+              style={[
+                styles.secondsText,
+                { color: theme.textSecondary, fontSize: fontScale.secondsSize },
+              ]}
+              numberOfLines={1}
+            >
+              :{seconds}
+            </Text>
+          )}
+
+          {/* AM/PM */}
+          {settings.timeFormat12h && (
+            <Text
+              style={[
+                styles.periodText,
+                { color: theme.accent, fontSize: fontScale.periodSize },
+              ]}
+              numberOfLines={1}
+            >
+              {period}
+            </Text>
+          )}
         </View>
 
         {/* Prominent Day & Date Display (e.g. Tuesday 8th September 2026) */}
@@ -181,6 +183,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
+    paddingBottom: 40,
     justifyContent: 'space-between',
     position: 'relative',
   },
@@ -229,6 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'center',
+    flexWrap: 'nowrap',
   },
   timeDigits: {
     fontSize: 96,
@@ -236,21 +240,17 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -2,
   },
-  metaColumn: {
-    marginLeft: 12,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-  },
-  periodText: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
-    letterSpacing: 1,
-  },
   secondsText: {
     fontSize: 32,
     fontWeight: '600',
     fontVariant: ['tabular-nums'],
+    marginLeft: 2,
+  },
+  periodText: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginLeft: 10,
+    letterSpacing: 1,
   },
   dateContainer: {
     flexDirection: 'row',
