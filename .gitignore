@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+

@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "big_clock_app",
-    "slug": "big_clock_app",
+    "name": "Big Clock & Reminders",
+    "slug": "big-clock-reminders",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": true
     },
     "android": {
       "adaptiveIcon": {
