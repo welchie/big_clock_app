@@ -27,6 +27,7 @@ import {
   cancelReminderNotification,
   requestNotificationPermissions,
 } from './services/notifications';
+import { generateUniqueId } from './utils/idGenerator';
 
 import { BigClock } from './components/BigClock';
 import { CalendarWidget } from './components/CalendarWidget';
@@ -166,7 +167,7 @@ export default function App() {
       // Create new
       const newObj: Reminder = {
         ...reminderData,
-        id: `rem-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        id: generateUniqueId('rem'),
         createdAt: Date.now(),
       };
 
