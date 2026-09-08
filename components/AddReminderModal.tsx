@@ -14,6 +14,7 @@ import { AppTheme, Reminder, ReminderCategory } from '../types/reminder';
 import { CATEGORY_COLORS } from '../constants/themes';
 import { getISODateString } from '../utils/dateFormatter';
 import { isValidISODate, isValidTime24 } from '../utils/validators';
+import { INPUT_LIMITS, sanitizeInputLength } from '../constants/inputLimits';
 
 interface AddReminderModalProps {
   visible: boolean;
@@ -73,10 +74,12 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
 
     onSave(
       {
-        title: title.trim(),
-        notes: notes.trim() || undefined,
-        date: date.trim(),
-        time: time.trim(),
+        title: sanitizeInputLength(title.trim(), INPUT_LIMITS.TITLE_MAX_LENGTH),
+        notes: notes.trim()
+          ? sanitizeInputLength(notes.trim(), INPUT_LIMITS.NOTES_MAX_LENGTH)
+          : undefined,
+        date: sanitizeInputLength(date.trim(), INPUT_LIMITS.DATE_MAX_LENGTH),
+        time: sanitizeInputLength(time.trim(), INPUT_LIMITS.TIME_MAX_LENGTH),
         category,
         isCompleted: editingReminder ? editingReminder.isCompleted : false,
         hasNotification,
@@ -112,6 +115,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                 ]}
                 placeholder="Reminder title (e.g. Doctor appointment)"
                 placeholderTextColor={theme.textSecondary + '70'}
+                maxLength={INPUT_LIMITS.TITLE_MAX_LENGTH}
                 value={title}
                 onChangeText={setTitle}
               />
@@ -162,6 +166,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                   ]}
                   placeholder="2026-09-08"
                   placeholderTextColor={theme.textSecondary + '70'}
+                  maxLength={INPUT_LIMITS.DATE_MAX_LENGTH}
                   value={date}
                   onChangeText={setDate}
                 />
@@ -183,6 +188,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                   ]}
                   placeholder="14:30"
                   placeholderTextColor={theme.textSecondary + '70'}
+                  maxLength={INPUT_LIMITS.TIME_MAX_LENGTH}
                   value={time}
                   onChangeText={setTime}
                 />
@@ -203,6 +209,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
                 ]}
                 placeholder="Additional details..."
                 placeholderTextColor={theme.textSecondary + '70'}
+                maxLength={INPUT_LIMITS.NOTES_MAX_LENGTH}
                 multiline
                 numberOfLines={3}
                 value={notes}
