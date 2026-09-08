@@ -149,34 +149,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     10:30
                   </Text>
-                  <View style={styles.previewMeta}>
-                    {settings.timeFormat12h && (
-                      <Text
-                        style={[
-                          styles.previewPeriod,
-                          {
-                            color: theme.accent,
-                            fontSize: Math.round(activeFontScale.periodSize * 0.38),
-                          },
-                        ]}
-                      >
-                        AM
-                      </Text>
-                    )}
-                    {settings.showSeconds && (
-                      <Text
-                        style={[
-                          styles.previewSeconds,
-                          {
-                            color: theme.textSecondary,
-                            fontSize: Math.round(activeFontScale.secondsSize * 0.38),
-                          },
-                        ]}
-                      >
-                        :45
-                      </Text>
-                    )}
-                  </View>
+                  {settings.showSeconds && (
+                    <Text
+                      style={[
+                        styles.previewSeconds,
+                        {
+                          color: theme.textSecondary,
+                          fontSize: Math.round(activeFontScale.secondsSize * 0.38),
+                        },
+                      ]}
+                    >
+                      :45
+                    </Text>
+                  )}
+                  {settings.timeFormat12h && (
+                    <Text
+                      style={[
+                        styles.previewPeriod,
+                        {
+                          color: theme.accent,
+                          fontSize: Math.round(activeFontScale.periodSize * 0.38),
+                        },
+                      ]}
+                    >
+                      AM
+                    </Text>
+                  )}
                 </View>
               </View>
             </View>
@@ -414,17 +412,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -1,
   },
-  previewMeta: {
-    marginLeft: 8,
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 4,
+  previewSeconds: {
+    fontWeight: '600',
+    marginLeft: 2,
   },
   previewPeriod: {
     fontWeight: '700',
-  },
-  previewSeconds: {
-    fontWeight: '600',
+    marginLeft: 6,
   },
   settingRow: {
     flexDirection: 'row',
