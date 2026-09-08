@@ -2,12 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
-  SafeAreaView,
   TouchableOpacity,
   Text,
-  StatusBar as RNStatusBar,
   Platform,
 } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -185,7 +184,8 @@ export default function App() {
   const activeTheme: AppTheme = THEMES[settings.themeId] || DEFAULT_THEME;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: activeTheme.bg }]}>
+    <SafeAreaProvider>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: activeTheme.bg }]}>
       <StatusBar style={activeTheme.id === 'soft-pastel' ? 'dark' : 'light'} hidden={false} />
 
       {/* Tablet Landscape Container */}
@@ -275,14 +275,14 @@ export default function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         onUpdateSettings={handleUpdateSettings}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0,
   },
   landscapeLayout: {
     flex: 1,
