@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppTheme, Reminder } from '../types/reminder';
 import { getMonthCalendarMatrix, getISODateString, CalendarDay } from '../utils/dateFormatter';
@@ -9,6 +17,8 @@ interface CalendarWidgetProps {
   reminders: Reminder[];
   selectedDate: string | null;
   onSelectDate: (dateStr: string | null) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
@@ -16,10 +26,27 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   reminders,
   selectedDate,
   onSelectDate,
+  isCollapsed: isCollapsedProp,
+  onToggleCollapse,
 }) => {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+
+  const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
+
+  const toggleCollapse = () => {
+    if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (onToggleCollapse) {
+      onToggleCollapse();
+    } else {
+      setInternalCollapsed(prev => !prev);
+    }
+  };
 
   const monthsList = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -60,12 +87,32 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-      {/* Calendar Header with Navigation */}
-      <View style={styles.header}>
-        <Text style={[styles.monthYearTitle, { color: theme.textPrimary }]}>
-          {monthsList[currentMonth]} {currentYear}
-        </Text>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: theme.cardBg, borderColor: theme.border },
+        isCollapsed && styles.cardCollapsed,
+      ]}
+    >
+      {/* Calendar Header with Navigation & Collapse Toggle */}
+      <View style={[styles.header, isCollapsed && styles.headerCollapsed]}>
+        <TouchableOpacity
+          style={styles.titleClickable}
+          onPress={toggleCollapse}
+          activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityLabel={isCollapsed ? 'Expand calendar' : 'Collapse calendar'}
+          accessibilityRole="button"
+        >
+          <Text style={[styles.monthYearTitle, { color: theme.textPrimary }]}>
+            {monthsList[currentMonth]} {currentYear}
+          </Text>
+          <Ionicons
+            name={isCollapsed ? 'chevron-down' : 'chevron-up'}
+            size={14}
+            color={theme.accent}
+          />
+        </TouchableOpacity>
 
         <View style={styles.navRow}>
           {selectedDate !== null && (
@@ -84,29 +131,55 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
             <Text style={[styles.todayButtonText, { color: theme.textSecondary }]}>Today</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.arrowButton} onPress={handlePrevMonth}>
-            <Ionicons name="chevron-back" size={18} color={theme.textPrimary} />
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={handlePrevMonth}
+            accessibilityLabel="Previous month"
+          >
+            <Ionicons name="chevron-back" size={16} color={theme.textPrimary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.arrowButton} onPress={handleNextMonth}>
-            <Ionicons name="chevron-forward" size={18} color={theme.textPrimary} />
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={handleNextMonth}
+            accessibilityLabel="Next month"
+          >
+            <Ionicons name="chevron-forward" size={16} color={theme.textPrimary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.collapseToggleBtn,
+              { backgroundColor: theme.bg, borderColor: theme.border },
+            ]}
+            onPress={toggleCollapse}
+            activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityLabel={isCollapsed ? 'Expand calendar' : 'Collapse calendar'}
+          >
+            <Ionicons
+              name={isCollapsed ? 'chevron-down' : 'chevron-up'}
+              size={13}
+              color={theme.accent}
+            />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Weekday Labels Header */}
-      <View style={styles.weekHeadersRow}>
-        {weekDayHeaders.map((day, idx) => (
-          <Text key={idx} style={[styles.weekHeaderCell, { color: theme.textSecondary }]}>
-            {day}
-          </Text>
-        ))}
-      </View>
+      {/* Weekday Labels Header & Days Grid (Only rendered when expanded) */}
+      {!isCollapsed && (
+        <>
+          <View style={styles.weekHeadersRow}>
+            {weekDayHeaders.map((day, idx) => (
+              <Text key={idx} style={[styles.weekHeaderCell, { color: theme.textSecondary }]}>
+                {day}
+              </Text>
+            ))}
+          </View>
 
-      {/* Days Grid */}
-      <View style={styles.grid}>
-        {matrix.map((week, wIdx) => (
-          <View key={wIdx} style={styles.weekRow}>
+          <View style={styles.grid}>
+            {matrix.map((week, wIdx) => (
+              <View key={wIdx} style={styles.weekRow}>
             {week.map((cell: CalendarDay, cIdx: number) => {
               const isSelected = selectedDate === cell.dateString;
               const hasReminder = datesWithReminders.has(cell.dateString);
@@ -156,6 +229,8 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
           </View>
         ))}
       </View>
+        </>
+      )}
     </View>
   );
 };
@@ -166,11 +241,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  cardCollapsed: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 6,
+  },
+  headerCollapsed: {
+    marginBottom: 0,
+  },
+  titleClickable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  collapseToggleBtn: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   monthYearTitle: {
     fontSize: 14,
