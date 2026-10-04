@@ -134,6 +134,14 @@ describe('VULN-02: Storage Schema Validation & Deserialization Defense', () => {
       assert.strictEqual(validated.clockFontSize, DEFAULT_SETTINGS.clockFontSize);
     });
 
+    it('accepts all valid font size options including tablet sizes (giant, massive)', () => {
+      const validSizes = ['small', 'medium', 'large', 'huge', 'giant', 'massive'] as const;
+      validSizes.forEach(size => {
+        const validated = validateSettingsObject({ clockFontSize: size });
+        assert.strictEqual(validated.clockFontSize, size);
+      });
+    });
+
     it('sanitizes unknown clock font sizes back to default', () => {
       const invalidFontSize = {
         clockFontSize: 'super-massive-gigantic',

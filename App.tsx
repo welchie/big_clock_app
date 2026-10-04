@@ -107,7 +107,7 @@ export default function App() {
   };
 
   const handleCycleFontSize = () => {
-    const order: ClockFontSize[] = ['small', 'medium', 'large', 'huge'];
+    const order: ClockFontSize[] = ['small', 'medium', 'large', 'huge', 'giant', 'massive'];
     const currentIndex = order.indexOf(settings.clockFontSize || 'medium');
     const nextIndex = (currentIndex + 1) % order.length;
     handleUpdateSettings({ clockFontSize: order[nextIndex] });

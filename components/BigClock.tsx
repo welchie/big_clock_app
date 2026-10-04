@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutChangeEvent } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppTheme, AppSettings } from '../types/reminder';
 import { formatTimeComponents, getOrdinalDateString, getWeekNumber } from '../utils/dateFormatter';
@@ -22,6 +22,8 @@ export const BigClock: React.FC<BigClockProps> = ({
   onOpenSettings,
   onCycleFontSize,
 }) => {
+  const [layoutDimensions, setLayoutDimensions] = useState<{ width: number; height: number } | null>(null);
+
   const { hours, minutes, seconds, period } = formatTimeComponents(
     currentTime,
     settings.timeFormat12h
@@ -31,6 +33,43 @@ export const BigClock: React.FC<BigClockProps> = ({
   const yearStr = currentTime.getFullYear().toString();
   const weekNum = getWeekNumber(currentTime);
   const fontScale = getClockFontScale(settings.clockFontSize);
+
+  const onClockLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    if (width > 0 && height > 0) {
+      setLayoutDimensions(prev => {
+        if (prev && Math.abs(prev.width - width) < 2 && Math.abs(prev.height - height) < 2) {
+          return prev;
+        }
+        return { width, height };
+      });
+    }
+  };
+
+  // Dynamic responsive scaling ensures full 180pt/216pt on tablets while gracefully adapting if column is compact
+  let scale = 1.0;
+  if (layoutDimensions && layoutDimensions.width > 0 && layoutDimensions.height > 0) {
+    const timeWidth = 2.7 * fontScale.timeSize;
+    const secondsWidth = settings.showSeconds ? 1.5 * fontScale.secondsSize + 4 : 0;
+    const periodWidth = settings.timeFormat12h ? 1.4 * fontScale.periodSize + 12 : 0;
+    const totalTimeRowWidth = timeWidth + secondsWidth + periodWidth + 16;
+
+    const fullDateLen = ordinalDateStr.length + yearStr.length + 1;
+    const totalDateWidth = fullDateLen * 0.52 * fontScale.dateSize + 16;
+
+    const totalHeight = fontScale.timeSize * 1.1 + fontScale.dateSize * 1.2 + 20;
+
+    const widthScale = layoutDimensions.width / Math.max(totalTimeRowWidth, totalDateWidth);
+    const heightScale = layoutDimensions.height / totalHeight;
+
+    scale = Math.min(1.0, widthScale, heightScale);
+  }
+
+  const effectiveTimeSize = Math.max(48, Math.round(fontScale.timeSize * scale));
+  const effectiveSecondsSize = Math.max(16, Math.round(fontScale.secondsSize * scale));
+  const effectivePeriodSize = Math.max(14, Math.round(fontScale.periodSize * scale));
+  const effectiveDateSize = Math.max(16, Math.round(fontScale.dateSize * scale));
+  const effectiveYearSize = Math.max(14, Math.round(fontScale.yearSize * scale));
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
@@ -108,14 +147,15 @@ export const BigClock: React.FC<BigClockProps> = ({
       </View>
 
       {/* Main Digital Clock Container */}
-      <View style={styles.clockSection}>
+      <View style={styles.clockSection} onLayout={onClockLayout}>
         <View style={styles.timeRow}>
           {/* Hours & Minutes */}
           <Text
             style={[
               styles.timeDigits,
-              { color: theme.clockText, fontSize: fontScale.timeSize },
+              { color: theme.clockText, fontSize: effectiveTimeSize },
             ]}
+            numberOfLines={1}
           >
             {hours}:{minutes}
           </Text>
@@ -125,7 +165,7 @@ export const BigClock: React.FC<BigClockProps> = ({
             <Text
               style={[
                 styles.secondsText,
-                { color: theme.textSecondary, fontSize: fontScale.secondsSize },
+                { color: theme.textSecondary, fontSize: effectiveSecondsSize },
               ]}
               numberOfLines={1}
             >
@@ -138,7 +178,7 @@ export const BigClock: React.FC<BigClockProps> = ({
             <Text
               style={[
                 styles.periodText,
-                { color: theme.accent, fontSize: fontScale.periodSize },
+                { color: theme.accent, fontSize: effectivePeriodSize },
               ]}
               numberOfLines={1}
             >
@@ -152,16 +192,18 @@ export const BigClock: React.FC<BigClockProps> = ({
           <Text
             style={[
               styles.ordinalDateText,
-              { color: theme.textPrimary, fontSize: fontScale.dateSize },
+              { color: theme.textPrimary, fontSize: effectiveDateSize },
             ]}
+            numberOfLines={1}
           >
             {ordinalDateStr}
           </Text>
           <Text
             style={[
               styles.yearText,
-              { color: theme.textSecondary, fontSize: fontScale.yearSize },
+              { color: theme.textSecondary, fontSize: effectiveYearSize },
             ]}
+            numberOfLines={1}
           >
             {yearStr}
           </Text>
@@ -182,8 +224,8 @@ export const BigClock: React.FC<BigClockProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    paddingBottom: 40,
+    padding: 20,
+    paddingBottom: 24,
     justifyContent: 'space-between',
     position: 'relative',
   },
@@ -227,12 +269,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'center',
     flexWrap: 'nowrap',
+    maxWidth: '100%',
   },
   timeDigits: {
     fontSize: 96,

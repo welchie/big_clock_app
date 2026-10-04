@@ -52,6 +52,26 @@ export const CLOCK_FONT_SIZES: Record<ClockFontSize, ClockFontScale> = {
     dateSize: 44,
     yearSize: 34,
   },
+  giant: {
+    id: 'giant',
+    label: 'Giant',
+    sublabel: '180pt',
+    timeSize: 180,
+    periodSize: 48,
+    secondsSize: 56,
+    dateSize: 48,
+    yearSize: 38,
+  },
+  massive: {
+    id: 'massive',
+    label: 'Massive',
+    sublabel: '216pt',
+    timeSize: 216,
+    periodSize: 56,
+    secondsSize: 66,
+    dateSize: 54,
+    yearSize: 42,
+  },
 };
 
 export const CLOCK_FONT_SIZE_OPTIONS: ClockFontScale[] = [
@@ -59,6 +79,8 @@ export const CLOCK_FONT_SIZE_OPTIONS: ClockFontScale[] = [
   CLOCK_FONT_SIZES.medium,
   CLOCK_FONT_SIZES.large,
   CLOCK_FONT_SIZES.huge,
+  CLOCK_FONT_SIZES.giant,
+  CLOCK_FONT_SIZES.massive,
 ];
 
 export const DEFAULT_CLOCK_FONT_SIZE: ClockFontSize = 'medium';
