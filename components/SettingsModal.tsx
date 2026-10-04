@@ -143,9 +143,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       styles.previewDigits,
                       {
                         color: theme.clockText,
-                        fontSize: Math.round(activeFontScale.timeSize * 0.38),
+                        fontSize: Math.round(activeFontScale.timeSize * 0.32),
                       },
                     ]}
+                    numberOfLines={1}
                   >
                     10:30
                   </Text>
@@ -155,9 +156,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         styles.previewSeconds,
                         {
                           color: theme.textSecondary,
-                          fontSize: Math.round(activeFontScale.secondsSize * 0.38),
+                          fontSize: Math.round(activeFontScale.secondsSize * 0.32),
                         },
                       ]}
+                      numberOfLines={1}
                     >
                       :45
                     </Text>
@@ -168,9 +170,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         styles.previewPeriod,
                         {
                           color: theme.accent,
-                          fontSize: Math.round(activeFontScale.periodSize * 0.38),
+                          fontSize: Math.round(activeFontScale.periodSize * 0.32),
                         },
                       ]}
+                      numberOfLines={1}
                     >
                       AM
                     </Text>

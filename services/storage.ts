@@ -88,7 +88,7 @@ export function validateSettingsObject(data: unknown): AppSettings {
     return { ...DEFAULT_SETTINGS };
   }
   const parsed = data as Partial<AppSettings>;
-  const validFontSizes = ['small', 'medium', 'large', 'huge'];
+  const validFontSizes = ['small', 'medium', 'large', 'huge', 'giant', 'massive'];
   const clockFontSize = validFontSizes.includes(parsed.clockFontSize as string)
     ? (parsed.clockFontSize as AppSettings['clockFontSize'])
     : DEFAULT_SETTINGS.clockFontSize;

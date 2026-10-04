@@ -27,7 +27,7 @@ export interface AppTheme {
   nightOverlay: string;
 }
 
-export type ClockFontSize = 'small' | 'medium' | 'large' | 'huge';
+export type ClockFontSize = 'small' | 'medium' | 'large' | 'huge' | 'giant' | 'massive';
 
 export interface AppSettings {
   timeFormat12h: boolean;
